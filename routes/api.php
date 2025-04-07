@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -19,5 +20,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/post/{slug}', [PostController::class, 'show']);
     Route::delete('/post/{id}/destroy', [PostController::class, 'destroy']);
 
-    Route::get('/comments', [CommentController::class, 'index']);
+    Route::post('/post/{slug}/comment', [CommentController::class, 'store']);
+    Route::delete('/post/{id}/comment/delete', [CommentController::class, 'destroy']);
+
+    Route::post('/category/store', [CategoryController::class, 'store']);
 });
