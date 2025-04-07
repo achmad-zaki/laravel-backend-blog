@@ -15,7 +15,7 @@ class PostController extends Controller
     {
         $search = $request->query('search');
         $limit = $request->get('limit', 5);
-        $posts = Post::with('user', 'comments')->when($search, function ($query, $search) {
+        $posts = Post::with('user', 'comments.user')->when($search, function ($query, $search) {
             $query->where('title', 'like', "%{$search}%")
                 ->orWhere('slug', 'like', "%{$search}%")
                 ->orWhere('content', 'like', "%{$search}%")
@@ -38,7 +38,7 @@ class PostController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->with(['user', 'comments'])->first();
+        $post = Post::where('slug', $slug)->with(['user', 'comments.user'])->first();
 
         if (!$post) {
             return ApiResponse::error(message: 'Postingan tidak ditemukan', status: 404);
