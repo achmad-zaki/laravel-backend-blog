@@ -53,11 +53,16 @@ class PostController extends Controller
             'title' => 'required|max:255|unique:posts,title',
             'content' => 'required',
             'thumbnail' => 'nullable',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
         ], [
             'title.unique' => 'Judul sudah dibuat.',
             'title.required' => 'Title tidak boleh kosong.',
             'title.max' => 'Title maximal 200 karakter.',
             'content.required' => 'Content tidak boleh kosong.',
+            'categories.required' => 'Kategori wajib dipilih.',
+            'categories.array' => 'Format kategori tidak valid.',
+            'categories.*.exists' => 'Kategori yang dipilih tidak ditemukan.'
         ]);
 
         $slug = Str::slug($validated['title']);
@@ -70,6 +75,10 @@ class PostController extends Controller
             'thumbnail' => $validated['thumbnail'] ?? null,
             'published_at' => $validated['published_at'] ?? Carbon::now(),
         ]);
+
+        if (isset($validated['categories'])) {
+            $post->categories()->sync($validated['categories']);
+        }
 
         return ApiResponse::success(data: $post, status: 201);
     }
@@ -86,14 +95,23 @@ class PostController extends Controller
             'title' => 'required|max:255',
             'content' => 'required',
             'thumbnail' => 'nullable',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
         ], [
             'title.required' => 'Title tidak boleh kosong.',
             'title.max' => 'Title maximal 200 karakter.',
             'content.required' => 'Content tidak boleh kosong.',
+            'categories.required' => 'Kategori wajib dipilih.',
+            'categories.array' => 'Format kategori tidak valid.',
+            'categories.*.exists' => 'Kategori yang dipilih tidak ditemukan.'
         ]);
 
         if ($request->has('title')) {
             $post->slug = Str::slug($validated['title']);
+        }
+
+        if (isset($validated['categories'])) {
+            $post->categories()->sync($validated['categories']);
         }
 
         $post->update($validated);
